@@ -338,16 +338,16 @@ export function useSelectedTaskId(uuid: string): number {
     localSingle != null ||
     siteSingle != null ||
     invertHomepagePingTaskBindings(settings.homepagePingBindings).has(uuid);
-  const availableTaskIds = useAvailablePingTaskIds(uuid);
+  const latestTaskIds = useLatestPingTaskIds(uuid);
 
   return useMemo(
     () =>
       resolveHomepagePingTaskId(
         localSingle ?? siteTaskId,
-        availableTaskIds,
+        latestTaskIds,
         explicitlySelected,
       ),
-    [availableTaskIds, explicitlySelected, localSingle, siteTaskId],
+    [explicitlySelected, latestTaskIds, localSingle, siteTaskId],
   );
 }
 
@@ -427,11 +427,10 @@ const EMPTY_TASK_IDS: readonly number[] = [];
 const availableTaskIdsCache = new WeakMap<object, readonly number[]>();
 
 /**
- * 这台节点当前启用的线路：只看缓冲区最新样本，探测失败的负值也算已配置。
+ * 卡片线路切换菜单的可选线路：缓冲区中至少有一个样本出现过值（探测失败的负值也算），按线路表顺序。
  *
- * 不能扫描整小时里「曾经有过值」的线路：节点把移动改成电信后，旧的移动历史还会留在窗口里，
- * 若继续把它算作可用线路，首页就可能选中已经禁用的旧线路。最新样本中为 null 的线路不再参与选择。
- * 卡片线路切换菜单和单线路自动回退共用这份结果。按样本数组缓存，同一份缓冲区返回同一个数组。
+ * 保留历史窗口中的线路，方便用户切回刚刚停用、但仍有历史曲线的线路。
+ * 按样本数组缓存，同一份缓冲区返回同一个数组。
  */
 export function listAvailablePingTaskIds(
   samples: readonly PingLiveSample[],
@@ -439,16 +438,39 @@ export function listAvailablePingTaskIds(
   if (samples.length === 0) return EMPTY_TASK_IDS;
   const cached = availableTaskIdsCache.get(samples);
   if (cached) return cached;
+  const taskIds = CARRIER_TASKS.filter((task) =>
+    samples.some((sample) => sample.ping[task.key] != null),
+  ).map((task) => task.id);
+  availableTaskIdsCache.set(samples, taskIds);
+  return taskIds;
+}
+
+/**
+ * 首页单线路自动回退专用：只认最新样本里仍有值的线路，防止历史窗口中的旧线路抢占默认选择。
+ * 负值（本轮探测超时）仍算已配置；null 才表示该线路当前未启用。
+ */
+const latestTaskIdsCache = new WeakMap<object, readonly number[]>();
+
+export function listLatestPingTaskIds(
+  samples: readonly PingLiveSample[],
+): readonly number[] {
+  if (samples.length === 0) return EMPTY_TASK_IDS;
+  const cached = latestTaskIdsCache.get(samples);
+  if (cached) return cached;
   const latest = samples[samples.length - 1];
   const taskIds = latest
     ? CARRIER_TASKS.filter((task) => latest.ping[task.key] != null).map((task) => task.id)
     : [];
-  availableTaskIdsCache.set(samples, taskIds);
+  latestTaskIdsCache.set(samples, taskIds);
   return taskIds;
 }
 
 export function useAvailablePingTaskIds(uuid: string, enabled = true): readonly number[] {
   return listAvailablePingTaskIds(usePingSamples(uuid, enabled));
+}
+
+export function useLatestPingTaskIds(uuid: string, enabled = true): readonly number[] {
+  return listLatestPingTaskIds(usePingSamples(uuid, enabled));
 }
 
 /**
