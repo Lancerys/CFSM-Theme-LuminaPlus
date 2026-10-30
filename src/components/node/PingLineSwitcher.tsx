@@ -164,8 +164,9 @@ function PingLineMenu({
         nodePingLineOverrides(homepagePingLineOverrides, uuid),
       );
   const localSingle = singleLineOverride(overrides);
+  const selectedSingleTaskId = useSelectedTaskId(uuid);
   const displayed = single
-    ? [localSingle ?? singleDefault]
+    ? [selectedSingleTaskId]
     : resolveNodePingLineTaskIds(nodeDefault, overrides);
   const currentTaskId = displayed[single ? 0 : slot];
   // 有数据的线路才列（后端对没配探测目标的槽位下发 false，换过去只会是一行「无样本」）；

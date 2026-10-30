@@ -33,6 +33,25 @@ export function resolveDefaultHomepagePingTaskId(value: unknown): number {
 }
 
 /**
+ * 单线路首页优先使用明确选择的线路；没有逐节点指定时，如果站点默认线路在该节点上没有探测数据，
+ * 就回退到该节点最新样本里实际启用的第一条线路。这样每台机器可以按 Agent 自己配置的 CT/CU/CM 显示。
+ */
+export function resolveHomepagePingTaskId(
+  preferredTaskId: number,
+  availableTaskIds: readonly number[],
+  hasExplicitSelection = false,
+): number {
+  if (
+    hasExplicitSelection ||
+    availableTaskIds.length === 0 ||
+    availableTaskIds.includes(preferredTaskId)
+  ) {
+    return preferredTaskId;
+  }
+  return availableTaskIds[0] ?? preferredTaskId;
+}
+
+/**
  * 多线路模式没配过时的默认：三条线路（电信 / 联通 / 移动，BD 不在其中）—— 沿用「三网」时代的
  * 口径，存量站点升级后看到的东西不变。条数本身可由站长在设置页改成 1~{@link HOMEPAGE_MULTI_PING_MAX_COUNT} 条。
  * 线路 id 由 CARRIER_TASKS 固定，不会因站点而异，所以可以硬编码成默认值。

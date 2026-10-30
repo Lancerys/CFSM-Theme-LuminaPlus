@@ -40,6 +40,7 @@ import { resolvePingSampleCounts } from "@/utils/pingMetrics";
 import {
   invertHomepagePingTaskBindings,
   resolveDefaultHomepagePingTaskId,
+  resolveHomepagePingTaskId,
   isHomepageMultiPingConfigured,
 } from "@/utils/pingTasks";
 import type { NodeViewMode } from "@/utils/themeSettings";
@@ -327,8 +328,27 @@ export function useSiteSelectedTaskId(uuid: string): number {
 /** 单线路实际画哪条：本机在卡片上换过的压过上面那份默认。 */
 export function useSelectedTaskId(uuid: string): number {
   const siteTaskId = useSiteSelectedTaskId(uuid);
-  const localSingle = singleLineOverride(useNodePingLineOverrides(uuid));
-  return localSingle ?? siteTaskId;
+  const settings = useThemeSettings();
+  const siteSingle = singleLineOverride(
+    nodePingLineOverrides(settings.homepagePingLineOverrides, uuid),
+  );
+  const localOverrides = useNodePingLineOverrides(uuid);
+  const localSingle = singleLineOverride(localOverrides);
+  const explicitlySelected =
+    localSingle != null ||
+    siteSingle != null ||
+    invertHomepagePingTaskBindings(settings.homepagePingBindings).has(uuid);
+  const availableTaskIds = useAvailablePingTaskIds(uuid);
+
+  return useMemo(
+    () =>
+      resolveHomepagePingTaskId(
+        localSingle ?? siteTaskId,
+        availableTaskIds,
+        explicitlySelected,
+      ),
+    [availableTaskIds, explicitlySelected, localSingle, siteTaskId],
+  );
 }
 
 /**
@@ -407,11 +427,11 @@ const EMPTY_TASK_IDS: readonly number[] = [];
 const availableTaskIdsCache = new WeakMap<object, readonly number[]>();
 
 /**
- * 这台节点有数据的线路（缓冲区里至少一个样本有值，探测失败的负值也算），按线路表顺序。
+ * 这台节点当前启用的线路：只看缓冲区最新样本，探测失败的负值也算已配置。
  *
- * 卡片线路切换菜单只列这些：后端对没配探测目标的槽位下发 `false`（→ null），那几条对这台节点
- * 永远是空的，换过去只会是一行「无样本」——「没数据就不展示」是站长定的口径。
- * 按样本数组缓存，同一份缓冲区返回同一个数组。
+ * 不能扫描整小时里「曾经有过值」的线路：节点把移动改成电信后，旧的移动历史还会留在窗口里，
+ * 若继续把它算作可用线路，首页就可能选中已经禁用的旧线路。最新样本中为 null 的线路不再参与选择。
+ * 卡片线路切换菜单和单线路自动回退共用这份结果。按样本数组缓存，同一份缓冲区返回同一个数组。
  */
 export function listAvailablePingTaskIds(
   samples: readonly PingLiveSample[],
@@ -419,9 +439,10 @@ export function listAvailablePingTaskIds(
   if (samples.length === 0) return EMPTY_TASK_IDS;
   const cached = availableTaskIdsCache.get(samples);
   if (cached) return cached;
-  const taskIds = CARRIER_TASKS.filter((task) =>
-    samples.some((sample) => sample.ping[task.key] != null),
-  ).map((task) => task.id);
+  const latest = samples[samples.length - 1];
+  const taskIds = latest
+    ? CARRIER_TASKS.filter((task) => latest.ping[task.key] != null).map((task) => task.id)
+    : [];
   availableTaskIdsCache.set(samples, taskIds);
   return taskIds;
 }
