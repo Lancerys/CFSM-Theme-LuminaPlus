@@ -18,6 +18,12 @@ import {
 } from "@/services/cfsm/config";
 import { DEFAULT_CARRIER_NAMES } from "@/services/cfsm/mappers";
 import { ApiRequestError } from "@/services/cfsm/http";
+import {
+  getPingHistorySnapshot,
+  resetPingLiveStore,
+  seedPingHistory,
+} from "@/services/pingLiveStore";
+import { EMPTY_CARRIER_PING } from "@/types/cfsm";
 
 const ORIGIN = "https://status.example.com";
 
@@ -115,6 +121,7 @@ beforeEach(() => {
   resetApiBaseCache();
   clearHistoryCache();
   resetRecentThemeOptionsWrite();
+  resetPingLiveStore();
   window.localStorage.clear();
   document.head.innerHTML = "";
   fetchMock = vi.fn();
@@ -122,6 +129,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  resetPingLiveStore();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -175,6 +183,52 @@ describe("getPublic", () => {
     const config = await getPublic();
 
     expect(config.latencyWindow).toBeUndefined();
+  });
+
+
+  it("preserves real, identical Ping samples when the new window config arrives after the snapshot", async () => {
+    const now = Date.now();
+    seedPingHistory(
+      "node-steady",
+      Array.from({ length: 20 }, (_, index) => ({
+        time: now - (19 - index) * 6 * 60_000,
+        ping: { ...EMPTY_CARRIER_PING, cm: 12, lossCm: 0 },
+      })),
+    );
+
+    // 未读 config 时先按旧后端保护逻辑处理，因此暂时是空的。
+    expect(getPingHistorySnapshot("node-steady")).toHaveLength(0);
+    fetchMock.mockImplementation(
+      jsonReply({ site_title: "S", latency_window: { points: 20, hours: 2 } }),
+    );
+
+    await getPublic();
+
+    // 新后端下发的是 20 个真实点，不能把稳定延迟错判成复印件删掉。
+    expect(getPingHistorySnapshot("node-steady")).toHaveLength(20);
+    expect(getPingHistorySnapshot("node-steady").every((s) => s.ping.cm === 12)).toBe(true);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the legacy duplicated-window guard when latency_window is absent", async () => {
+    const now = Date.now();
+    fetchMock.mockImplementation(
+      jsonReply({ site_title: "S", latency_window: { points: 20, hours: 2 } }),
+    );
+    await getPublic();
+
+    seedPingHistory(
+      "node-legacy",
+      Array.from({ length: 30 }, (_, index) => ({
+        time: now - (29 - index) * 120_000,
+        ping: { ...EMPTY_CARRIER_PING, cm: 12, lossCm: 0 },
+      })),
+    );
+    expect(getPingHistorySnapshot("node-legacy")).toHaveLength(30);
+
+    fetchMock.mockImplementation(jsonReply({ site_title: "S" }));
+    await getPublic();
+    expect(getPingHistorySnapshot("node-legacy")).toHaveLength(0);
   });
 
   it("takes the carrier names the backend customised", async () => {
