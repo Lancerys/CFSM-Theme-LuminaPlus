@@ -3,7 +3,6 @@ import {
   buildPingBuckets,
   HOMEPAGE_PING_BUCKET_COUNT,
   buildPingOverviewItem,
-  listLatestPingTaskIds,
   resolveHomepagePingRequestMode,
   withLiveLatency,
 } from "@/hooks/usePingOverview";
@@ -118,21 +117,6 @@ describe("buildPingOverviewItem", () => {
     expect(buildPingOverviewItem("node-a", 99, [sample(1, { ct: 30 })]).isAssigned).toBe(
       false,
     );
-  });
-});
-
-describe("listLatestPingTaskIds", () => {
-  it("uses the latest sample so previously disabled lines do not affect automatic fallback", () => {
-    const samples = [
-      sample(2, { ct: 35, cm: 80 }),
-      sample(1, { cm: 82 }),
-    ];
-
-    expect(listLatestPingTaskIds(samples)).toEqual([3]);
-  });
-
-  it("keeps a configured line available when its latest probe timed out", () => {
-    expect(listLatestPingTaskIds([sample(1, { cm: -1, lossCm: 100 })])).toEqual([3]);
   });
 });
 

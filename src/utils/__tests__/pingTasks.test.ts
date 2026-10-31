@@ -5,7 +5,6 @@ import {
   HOMEPAGE_MULTI_PING_MAX_COUNT,
   assignHomepageMultiPingTask,
   resolveDefaultHomepagePingTaskId,
-  resolveHomepagePingTaskId,
   isHomepageMultiPingConfigured,
   normalizeHomepageMultiPingTaskIds,
   invertHomepagePingTaskBindings,
@@ -109,16 +108,6 @@ describe("homepage ping task bindings", () => {
     expect(
       resolveHomepagePingTaskIdsByClient(["old-node"], { "3": ["old-node"] }, [], 2),
     ).toEqual(new Map([["old-node", [3]]]));
-  });
-
-  it("keeps an available per-node line when the global default is not configured on that node", () => {
-    expect(resolveHomepagePingTaskId(1, [3])).toBe(3);
-    expect(resolveHomepagePingTaskId(3, [1, 3])).toBe(3);
-    expect(resolveHomepagePingTaskId(1, [1, 3])).toBe(1);
-    // 明确的逐节点绑定 / 用户手动选择优先，即使当前没有样本也不擅自换线。
-    expect(resolveHomepagePingTaskId(1, [3], true)).toBe(1);
-    // 尚无任何样本时保留站点默认线路，等 Agent 首次上报。
-    expect(resolveHomepagePingTaskId(1, [])).toBe(1);
   });
 
   it("keeps 电信 as the fallback when the default line is unset or invalid", () => {

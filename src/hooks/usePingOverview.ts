@@ -40,7 +40,6 @@ import { resolvePingSampleCounts } from "@/utils/pingMetrics";
 import {
   invertHomepagePingTaskBindings,
   resolveDefaultHomepagePingTaskId,
-  resolveHomepagePingTaskId,
   isHomepageMultiPingConfigured,
 } from "@/utils/pingTasks";
 import type { NodeViewMode } from "@/utils/themeSettings";
@@ -328,27 +327,8 @@ export function useSiteSelectedTaskId(uuid: string): number {
 /** 单线路实际画哪条：本机在卡片上换过的压过上面那份默认。 */
 export function useSelectedTaskId(uuid: string): number {
   const siteTaskId = useSiteSelectedTaskId(uuid);
-  const settings = useThemeSettings();
-  const siteSingle = singleLineOverride(
-    nodePingLineOverrides(settings.homepagePingLineOverrides, uuid),
-  );
-  const localOverrides = useNodePingLineOverrides(uuid);
-  const localSingle = singleLineOverride(localOverrides);
-  const explicitlySelected =
-    localSingle != null ||
-    siteSingle != null ||
-    invertHomepagePingTaskBindings(settings.homepagePingBindings).has(uuid);
-  const latestTaskIds = useLatestPingTaskIds(uuid);
-
-  return useMemo(
-    () =>
-      resolveHomepagePingTaskId(
-        localSingle ?? siteTaskId,
-        latestTaskIds,
-        explicitlySelected,
-      ),
-    [explicitlySelected, latestTaskIds, localSingle, siteTaskId],
-  );
+  const localSingle = singleLineOverride(useNodePingLineOverrides(uuid));
+  return localSingle ?? siteTaskId;
 }
 
 /**
@@ -427,9 +407,10 @@ const EMPTY_TASK_IDS: readonly number[] = [];
 const availableTaskIdsCache = new WeakMap<object, readonly number[]>();
 
 /**
- * 卡片线路切换菜单的可选线路：缓冲区中至少有一个样本出现过值（探测失败的负值也算），按线路表顺序。
+ * 这台节点有数据的线路（缓冲区里至少一个样本有值，探测失败的负值也算），按线路表顺序。
  *
- * 保留历史窗口中的线路，方便用户切回刚刚停用、但仍有历史曲线的线路。
+ * 卡片线路切换菜单只列这些：后端对没配探测目标的槽位下发 `false`（→ null），那几条对这台节点
+ * 永远是空的，换过去只会是一行「无样本」——「没数据就不展示」是站长定的口径。
  * 按样本数组缓存，同一份缓冲区返回同一个数组。
  */
 export function listAvailablePingTaskIds(
@@ -445,32 +426,8 @@ export function listAvailablePingTaskIds(
   return taskIds;
 }
 
-/**
- * 首页单线路自动回退专用：只认最新样本里仍有值的线路，防止历史窗口中的旧线路抢占默认选择。
- * 负值（本轮探测超时）仍算已配置；null 才表示该线路当前未启用。
- */
-const latestTaskIdsCache = new WeakMap<object, readonly number[]>();
-
-export function listLatestPingTaskIds(
-  samples: readonly PingLiveSample[],
-): readonly number[] {
-  if (samples.length === 0) return EMPTY_TASK_IDS;
-  const cached = latestTaskIdsCache.get(samples);
-  if (cached) return cached;
-  const latest = samples[samples.length - 1];
-  const taskIds = latest
-    ? CARRIER_TASKS.filter((task) => latest.ping[task.key] != null).map((task) => task.id)
-    : [];
-  latestTaskIdsCache.set(samples, taskIds);
-  return taskIds;
-}
-
 export function useAvailablePingTaskIds(uuid: string, enabled = true): readonly number[] {
   return listAvailablePingTaskIds(usePingSamples(uuid, enabled));
-}
-
-export function useLatestPingTaskIds(uuid: string, enabled = true): readonly number[] {
-  return listLatestPingTaskIds(usePingSamples(uuid, enabled));
 }
 
 /**
