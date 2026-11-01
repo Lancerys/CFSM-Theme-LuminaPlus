@@ -682,11 +682,7 @@ const CompactNodeHealth = memo(function CompactNodeHealth({
         }
         value={ping.lastValue != null ? Math.round(ping.lastValue).toString() : emptyText}
         unit={ping.lastValue != null ? "ms" : undefined}
-        color={
-          ping.lastValue != null && ping.lastValue > 100 && ping.lastValue <= 160
-            ? "var(--compact-latency-moderate-text, var(--latency-moderate))"
-            : latencyColor
-        }
+        color={latencyColor}
       >
         <HealthBars buckets={pingBuckets} kind="latency" />
       </CompactHealthItem>

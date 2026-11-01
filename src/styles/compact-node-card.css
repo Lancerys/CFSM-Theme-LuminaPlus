@@ -776,10 +776,3 @@
     gap: 7px;
   }
 }
-
-
-/* 浅色卡片：仅 101–160ms 中等延迟的数值文字改为深橄榄绿。
-   其余延迟档位、丢包数值、状态柱和暗色主题全部沿用原版。 */
-:root[data-appearance="light"] {
-  --compact-latency-moderate-text: #596322;
-}

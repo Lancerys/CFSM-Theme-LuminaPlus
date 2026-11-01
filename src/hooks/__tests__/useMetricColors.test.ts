@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_DARK_DEPTH,
+  METRIC_COLOR_META,
+  METRIC_COLOR_GROUPS,
   normalizeDarkDepth,
   pickPaletteOverrides,
   pickPaletteSettings,
@@ -84,5 +86,56 @@ describe("pickPaletteOverrides", () => {
   it("keeps a dark depth that only differs from the site, even if it equals the default", () => {
     // 站点是 60（深黑）时选「灰黑」(= 默认 0)：必须记下来，否则值会弹回 60。
     expect(pickPaletteOverrides({ ...site, darkDepth: 0 }, site)).toEqual({ darkDepth: 0 });
+  });
+});
+
+
+describe("network latency color picker integration", () => {
+  const latencyEntries = METRIC_COLOR_META.filter((entry) => entry.group === "latency");
+
+  it("exposes all five latency bands with their shared CSS variables", () => {
+    expect(METRIC_COLOR_GROUPS.some((group) => group.id === "latency")).toBe(true);
+    expect(latencyEntries.map(({ key, cssVar }) => [key, cssVar])).toEqual([
+      ["latencyExcellent", "--latency-excellent"],
+      ["latencyGood", "--latency-good"],
+      ["latencyModerate", "--latency-moderate"],
+      ["latencyElevated", "--latency-elevated"],
+      ["latencyCritical", "--latency-critical"],
+    ]);
+  });
+
+  it("exports valid five-band colors for site sync and ignores invalid values", () => {
+    expect(pickPaletteSettings({
+      metricColors: {
+        latencyGood: "#4B602C",
+        latencyModerate: "#665724",
+        latencyCritical: "not-a-hex",
+      },
+    })).toEqual({
+      metricColors: {
+        latencyGood: "#4b602c",
+        latencyModerate: "#665724",
+      },
+    });
+  });
+
+  it("keeps each latency color independent when overriding site colors", () => {
+    const site = {
+      colors: { latencyGood: "#112233", latencyModerate: "#445566" },
+      darkDepth: 0,
+    };
+    expect(pickPaletteOverrides({
+      colors: { latencyGood: "#112233", latencyModerate: "#665724" },
+      darkDepth: 0,
+    }, site)).toEqual({ metricColors: { latencyModerate: "#665724" } });
+    expect(pickPaletteSettings({ metricColors: site.colors }, {
+      metricColors: { latencyModerate: "#665724" },
+    })).toEqual({
+      metricColors: { latencyGood: "#112233", latencyModerate: "#665724" },
+    });
+    expect(pickPaletteOverrides({
+      colors: { latencyModerate: "#445566" },
+      darkDepth: 0,
+    }, site)).toEqual({ metricColors: { latencyGood: "" } });
   });
 });

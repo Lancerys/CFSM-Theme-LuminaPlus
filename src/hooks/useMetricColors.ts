@@ -21,14 +21,20 @@ export type MetricColorKey =
   | "speedHigh"
   | "speedMax"
   | "trafficUp"
-  | "trafficDown";
+  | "trafficDown"
+  | "latencyExcellent"
+  | "latencyGood"
+  | "latencyModerate"
+  | "latencyElevated"
+  | "latencyCritical";
 
-type MetricColorGroup = "metric" | "speed" | "traffic";
+type MetricColorGroup = "metric" | "speed" | "traffic" | "latency";
 
 export const METRIC_COLOR_GROUPS: ReadonlyArray<{ id: MetricColorGroup; labelKey: MessageKey }> = [
   { id: "metric", labelKey: "colors.groupMetric" },
   { id: "speed", labelKey: "colors.groupSpeed" },
   { id: "traffic", labelKey: "colors.groupTraffic" },
+  { id: "latency", labelKey: "colors.groupLatency" },
 ];
 
 export const METRIC_COLOR_META: ReadonlyArray<{
@@ -48,6 +54,11 @@ export const METRIC_COLOR_META: ReadonlyArray<{
   { key: "speedMax", labelKey: "colors.speedMax", cssVar: "--speed-max", group: "speed" },
   { key: "trafficUp", labelKey: "traffic.upload", cssVar: "--traffic-up", group: "traffic" },
   { key: "trafficDown", labelKey: "traffic.download", cssVar: "--traffic-down", group: "traffic" },
+  { key: "latencyExcellent", labelKey: "colors.latencyExcellent", cssVar: "--latency-excellent", group: "latency" },
+  { key: "latencyGood", labelKey: "colors.latencyGood", cssVar: "--latency-good", group: "latency" },
+  { key: "latencyModerate", labelKey: "colors.latencyModerate", cssVar: "--latency-moderate", group: "latency" },
+  { key: "latencyElevated", labelKey: "colors.latencyElevated", cssVar: "--latency-elevated", group: "latency" },
+  { key: "latencyCritical", labelKey: "colors.latencyCritical", cssVar: "--latency-critical", group: "latency" },
 ];
 
 type MetricColors = Partial<Record<MetricColorKey, string>>;

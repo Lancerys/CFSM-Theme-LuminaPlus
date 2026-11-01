@@ -56,10 +56,11 @@
   --status-warning: #e9a23b;
   --status-error: #dc2626;
   --status-info: #3b82f6;
-  /* 延迟状态阶梯：绿 → 黄绿 → 偏黄绿 → 暖金黄 → 红，避免高延迟档突兀跳橙。 */
+  /* 延迟五档默认色；数字和历史柱共用。中间两档默认降低饱和度与亮度，
+     其余色阶及深色模式保持 v1.2.22 原版，取色器可逐档覆盖全部五种。 */
   --latency-excellent: #2fc66e;
-  --latency-good: #9fe339;
-  --latency-moderate: #cbd83a;
+  --latency-good: #4b602c;
+  --latency-moderate: #665724;
   --latency-elevated: #e2a928;
   --latency-critical: #dc2626;
   /* 品牌强调色,Spinner 转动弧、ThemeManage 复选框等引用。 */

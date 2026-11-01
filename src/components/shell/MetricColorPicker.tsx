@@ -9,6 +9,7 @@ import {
   Zap,
   ArrowUp,
   ArrowDown,
+  Activity,
   RotateCcw,
 } from "lucide-react";
 import { usePreferences } from "@/hooks/usePreferences";
@@ -39,6 +40,11 @@ const ICONS: Record<MetricColorKey, typeof Cpu> = {
   speedMax: Zap,
   trafficUp: ArrowUp,
   trafficDown: ArrowDown,
+  latencyExcellent: Activity,
+  latencyGood: Activity,
+  latencyModerate: Activity,
+  latencyElevated: Activity,
+  latencyCritical: Activity,
 };
 
 export function MetricColorPicker({ hidden = false }: { hidden?: boolean }) {
