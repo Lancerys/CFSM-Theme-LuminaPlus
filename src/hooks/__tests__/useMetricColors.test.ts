@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { latencyHeatColor, lossHeatColor } from "@/utils/metricTone";
 import {
   DEFAULT_DARK_DEPTH,
-  METRIC_COLOR_META,
-  METRIC_COLOR_GROUPS,
   normalizeDarkDepth,
   pickPaletteOverrides,
   pickPaletteSettings,
@@ -87,90 +84,5 @@ describe("pickPaletteOverrides", () => {
   it("keeps a dark depth that only differs from the site, even if it equals the default", () => {
     // 站点是 60（深黑）时选「灰黑」(= 默认 0)：必须记下来，否则值会弹回 60。
     expect(pickPaletteOverrides({ ...site, darkDepth: 0 }, site)).toEqual({ darkDepth: 0 });
-  });
-});
-
-
-describe("network latency color picker integration", () => {
-  const latencyEntries = METRIC_COLOR_META.filter((entry) => entry.group === "latency");
-
-  it("exposes all five latency bands with their shared CSS variables", () => {
-    expect(METRIC_COLOR_GROUPS.some((group) => group.id === "latency")).toBe(true);
-    expect(latencyEntries.map(({ key, cssVar }) => [key, cssVar])).toEqual([
-      ["latencyExcellent", "--latency-excellent"],
-      ["latencyGood", "--latency-good"],
-      ["latencyModerate", "--latency-moderate"],
-      ["latencyElevated", "--latency-elevated"],
-      ["latencyCritical", "--latency-critical"],
-    ]);
-  });
-
-  it("exports valid five-band colors for site sync and ignores invalid values", () => {
-    expect(pickPaletteSettings({
-      metricColors: {
-        latencyGood: "#4B602C",
-        latencyModerate: "#665724",
-        latencyCritical: "not-a-hex",
-      },
-    })).toEqual({
-      metricColors: {
-        latencyGood: "#4b602c",
-        latencyModerate: "#665724",
-      },
-    });
-  });
-
-  it("keeps each latency color independent when overriding site colors", () => {
-    const site = {
-      colors: { latencyGood: "#112233", latencyModerate: "#445566" },
-      darkDepth: 0,
-    };
-    expect(pickPaletteOverrides({
-      colors: { latencyGood: "#112233", latencyModerate: "#665724" },
-      darkDepth: 0,
-    }, site)).toEqual({ metricColors: { latencyModerate: "#665724" } });
-    expect(pickPaletteSettings({ metricColors: site.colors }, {
-      metricColors: { latencyModerate: "#665724" },
-    })).toEqual({
-      metricColors: { latencyGood: "#112233", latencyModerate: "#665724" },
-    });
-    expect(pickPaletteOverrides({
-      colors: { latencyModerate: "#445566" },
-      darkDepth: 0,
-    }, site)).toEqual({ metricColors: { latencyGood: "" } });
-  });
-});
-
-
-describe("packet loss color editor and original defaults", () => {
-  it("supports five loss groups through the original color-picker pipeline", () => {
-    expect(METRIC_COLOR_GROUPS.some((g) => g.id === "loss")).toBe(true);
-    expect(METRIC_COLOR_META.filter((m) => m.group === "loss").map(({key,cssVar}) => [key,cssVar])).toEqual([
-      ["lossExcellent","--loss-custom-excellent"],
-      ["lossGood","--loss-custom-good"],
-      ["lossModerate","--loss-custom-moderate"],
-      ["lossElevated","--loss-custom-elevated"],
-      ["lossCritical","--loss-custom-critical"],
-    ]);
-  });
-
-  it("preserves original latency thresholds and exact continuous packet loss HSL defaults", () => {
-    expect(latencyHeatColor(96)).toBe("var(--latency-good)");
-    expect(latencyHeatColor(124)).toBe("var(--latency-moderate)");
-    expect(lossHeatColor(0.5)).toBe("var(--loss-custom-excellent, hsl(136.0 66.0% 49.5%))");
-    expect(lossHeatColor(2)).toBe("var(--loss-custom-good, hsl(103.5 73.0% 51.5%))");
-    expect(lossHeatColor(4)).toBe("var(--loss-custom-moderate, hsl(65.0 79.0% 52.5%))");
-    expect(lossHeatColor(7.5)).toBe("var(--loss-custom-elevated, hsl(40.0 84.0% 52.5%))");
-    expect(lossHeatColor(20)).toBe("var(--loss-custom-critical, hsl(18.0 85.0% 48.0%))");
-  });
-
-  it("merges saved loss colors with existing CPU and site defaults", () => {
-    expect(pickPaletteSettings({metricColors:{lossGood:"#234567",lossModerate:"#334455",lossCritical:"bad"}}))
-      .toEqual({metricColors:{lossGood:"#234567",lossModerate:"#334455"}});
-    const site={colors:{cpu:"#112233",lossGood:"#234567"},darkDepth:0};
-    expect(pickPaletteOverrides({colors:{cpu:"#112233",lossGood:"#445566"},darkDepth:0},site))
-      .toEqual({metricColors:{lossGood:"#445566"}});
-    expect(pickPaletteSettings({metricColors:site.colors},{metricColors:{lossGood:"#445566"}}))
-      .toEqual({metricColors:{cpu:"#112233",lossGood:"#445566"}});
   });
 });

@@ -56,7 +56,7 @@
   --status-warning: #e9a23b;
   --status-error: #dc2626;
   --status-info: #3b82f6;
-  /* 恢复 v1.2.22 作者原版的延迟五档默认色，数字与历史柱共用。 */
+  /* 延迟状态阶梯：绿 → 黄绿 → 偏黄绿 → 暖金黄 → 红，避免高延迟档突兀跳橙。 */
   --latency-excellent: #2fc66e;
   --latency-good: #9fe339;
   --latency-moderate: #cbd83a;

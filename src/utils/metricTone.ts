@@ -106,12 +106,5 @@ export function lossHeatColor(pct: number | null | undefined): string {
   if (pct == null || !Number.isFinite(pct) || pct < 0) {
     return "var(--text-tertiary)";
   }
-  // 未自定义时退回作者原版逐数值 HSL 渐变；修改某档只覆盖该区间。
-  const original = heatRamp(pct, [1, 3, 5, 10], 20);
-  const band =
-    pct <= 1 ? "excellent" :
-    pct <= 3 ? "good" :
-    pct <= 5 ? "moderate" :
-    pct <= 10 ? "elevated" : "critical";
-  return `var(--loss-custom-${band}, ${original})`;
+  return heatRamp(pct, [1, 3, 5, 10], 20);
 }

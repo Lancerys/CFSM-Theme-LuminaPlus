@@ -52,8 +52,7 @@ describe("latencyHeatColor", () => {
 
 describe("lossHeatColor", () => {
   it("treats 0% loss as the greenest, neutral only for negative / no data", () => {
-    // 默认 CSS fallback 必须精确保留作者原版 0% 丢包时的 HSL 色值。
-    expect(lossHeatColor(0)).toBe("var(--loss-custom-excellent, hsl(145.0 62.0% 48.0%))");
+    expect(hue(lossHeatColor(0))).toBeCloseTo(145, 0);
     expect(lossHeatColor(null)).toBe("var(--text-tertiary)");
     expect(lossHeatColor(-1)).toBe("var(--text-tertiary)");
   });

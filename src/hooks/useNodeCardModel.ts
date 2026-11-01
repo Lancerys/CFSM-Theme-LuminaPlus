@@ -208,11 +208,18 @@ export function useNodeCardModel(
     };
   }, [meta, now, showCardGroup, showCardPrice]);
 
-  // ping 派生的颜色只在 ping item 变化时才变。
+  // 数字统一使用正文色（浅色深字、深色浅字），不再使用 Ping 状态色。
+  // 缺少有效采样时仍沿用原版中性色；历史延迟/丢包柱继续独立使用原版热力色。
   const pingModel = useMemo(
     () => ({
-      latencyColor: latencyHeatColor(ping.lastValue),
-      lossColor: lossHeatColor(ping.loss),
+      latencyColor:
+        ping.lastValue != null && Number.isFinite(ping.lastValue) && ping.lastValue >= 0
+          ? "var(--text-primary)"
+          : latencyHeatColor(ping.lastValue),
+      lossColor:
+        ping.loss != null && Number.isFinite(ping.loss) && ping.loss >= 0
+          ? "var(--text-primary)"
+          : lossHeatColor(ping.loss),
       hasRealHomepagePingBinding,
       // 保留旧字段供外部模型消费者兼容；它表示真实配置状态。
       hasHomepagePingBinding: hasRealHomepagePingBinding,
