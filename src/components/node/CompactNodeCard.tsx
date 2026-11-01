@@ -336,7 +336,7 @@ function CompactHealthItem({
         <span className="compact-node-health-label">
           {label}
         </span>
-        <strong className="compact-node-health-value tabular" style={{ "--compact-health-status-color": color } as CSSProperties}>
+        <strong className="compact-node-health-value tabular" style={{ color }}>
           {value}
           {unit && <small>{unit}</small>}
         </strong>
@@ -682,7 +682,11 @@ const CompactNodeHealth = memo(function CompactNodeHealth({
         }
         value={ping.lastValue != null ? Math.round(ping.lastValue).toString() : emptyText}
         unit={ping.lastValue != null ? "ms" : undefined}
-        color={latencyColor}
+        color={
+          ping.lastValue != null && ping.lastValue > 100 && ping.lastValue <= 160
+            ? "var(--compact-latency-moderate-text, var(--latency-moderate))"
+            : latencyColor
+        }
       >
         <HealthBars buckets={pingBuckets} kind="latency" />
       </CompactHealthItem>

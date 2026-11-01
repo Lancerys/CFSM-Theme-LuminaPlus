@@ -521,7 +521,6 @@
 .compact-node-health-value {
   min-width: 0;
   overflow: hidden;
-  color: var(--compact-health-status-color, var(--text-primary));
   font-size: 13px;
   font-weight: 720;
   letter-spacing: -0.02em;
@@ -779,13 +778,8 @@
 }
 
 
-/* 仅浅色模式的延迟/丢包数字加深：保持动态状态色的色相，
-   让浅色半透明卡片上的黄绿文字有足够对比度。
-   不改变线路名称、历史柱状图及其他任何指标颜色。 */
-:root[data-appearance="light"] .compact-node-health-value {
-  color: color-mix(
-    in srgb,
-    var(--compact-health-status-color, var(--text-primary)) 35%,
-    var(--text-primary) 65%
-  );
+/* 浅色卡片：仅 101–160ms 中等延迟的数值文字改为深橄榄绿。
+   其余延迟档位、丢包数值、状态柱和暗色主题全部沿用原版。 */
+:root[data-appearance="light"] {
+  --compact-latency-moderate-text: #596322;
 }
