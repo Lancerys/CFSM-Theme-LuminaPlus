@@ -583,7 +583,14 @@
   position: relative;
 }
 
-.server-health-value,
+.server-health-value {
+  flex: 0 0 auto;
+  /* 与上方 CPU / 内存 MetricBar 的 13px font-semibold 保持一致。 */
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: inherit;
+}
+
 .server-card-meta-value {
   flex: 0 0 auto;
   font-size: 15px;
