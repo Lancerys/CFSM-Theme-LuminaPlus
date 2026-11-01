@@ -79,6 +79,8 @@
               const scrim = alpha >= 95 ? 0 : Math.round(((95 - alpha) / 95) * 16);
               const style = document.documentElement.style;
               style.setProperty("--surface-alpha", String(alpha));
+              // 首帧同步毛玻璃模式，避免页面挂载后才闪出效果。
+              document.documentElement.dataset.surfaceGlass = alpha < 100 ? "true" : "false";
               if (scrim > 0) {
                 style.setProperty(
                   "--bg-scrim",
@@ -92,17 +94,17 @@
         } catch {}
       })();
     </script>
-    <script type="module" crossorigin src="./assets/index-C6xckK6A.js"></script>
+    <script type="module" crossorigin src="./assets/index-CtimuYmD.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-Cyuzqnbw.js">
     <link rel="modulepreload" crossorigin href="./assets/charts-16KW4ylY.js">
     <link rel="modulepreload" crossorigin href="./assets/react-DAO37lkK.js">
     <link rel="modulepreload" crossorigin href="./assets/query-BRYNNX1d.js">
     <link rel="modulepreload" crossorigin href="./assets/validation-THDfX09h.js">
     <link rel="modulepreload" crossorigin href="./assets/i18n-Bw_JTP3h.js">
-    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-5OKAxAlb.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-TYlR53P4.js">
     <link rel="stylesheet" crossorigin href="./assets/charts-CnsZ1jie.css">
-    <link rel="stylesheet" crossorigin href="./assets/index-9nUTygM5.css">
-    <meta name="theme-version" content="LuminaPlus v1.2.24" />
+    <link rel="stylesheet" crossorigin href="./assets/index-DDguEm4n.css">
+    <meta name="theme-version" content="LuminaPlus v1.2.25" />
   </head>
   <body>
     <div id="root" class="relative z-30"></div>
