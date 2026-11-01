@@ -45,6 +45,11 @@ const ICONS: Record<MetricColorKey, typeof Cpu> = {
   latencyModerate: Activity,
   latencyElevated: Activity,
   latencyCritical: Activity,
+  lossExcellent: Activity,
+  lossGood: Activity,
+  lossModerate: Activity,
+  lossElevated: Activity,
+  lossCritical: Activity,
 };
 
 export function MetricColorPicker({ hidden = false }: { hidden?: boolean }) {

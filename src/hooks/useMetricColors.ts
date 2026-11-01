@@ -26,15 +26,21 @@ export type MetricColorKey =
   | "latencyGood"
   | "latencyModerate"
   | "latencyElevated"
-  | "latencyCritical";
+  | "latencyCritical"
+  | "lossExcellent"
+  | "lossGood"
+  | "lossModerate"
+  | "lossElevated"
+  | "lossCritical";
 
-type MetricColorGroup = "metric" | "speed" | "traffic" | "latency";
+type MetricColorGroup = "metric" | "speed" | "traffic" | "latency" | "loss";
 
 export const METRIC_COLOR_GROUPS: ReadonlyArray<{ id: MetricColorGroup; labelKey: MessageKey }> = [
   { id: "metric", labelKey: "colors.groupMetric" },
   { id: "speed", labelKey: "colors.groupSpeed" },
   { id: "traffic", labelKey: "colors.groupTraffic" },
   { id: "latency", labelKey: "colors.groupLatency" },
+  { id: "loss", labelKey: "colors.groupLoss" },
 ];
 
 export const METRIC_COLOR_META: ReadonlyArray<{
@@ -59,6 +65,11 @@ export const METRIC_COLOR_META: ReadonlyArray<{
   { key: "latencyModerate", labelKey: "colors.latencyModerate", cssVar: "--latency-moderate", group: "latency" },
   { key: "latencyElevated", labelKey: "colors.latencyElevated", cssVar: "--latency-elevated", group: "latency" },
   { key: "latencyCritical", labelKey: "colors.latencyCritical", cssVar: "--latency-critical", group: "latency" },
+  { key: "lossExcellent", labelKey: "colors.lossExcellent", cssVar: "--loss-custom-excellent", group: "loss" },
+  { key: "lossGood", labelKey: "colors.lossGood", cssVar: "--loss-custom-good", group: "loss" },
+  { key: "lossModerate", labelKey: "colors.lossModerate", cssVar: "--loss-custom-moderate", group: "loss" },
+  { key: "lossElevated", labelKey: "colors.lossElevated", cssVar: "--loss-custom-elevated", group: "loss" },
+  { key: "lossCritical", labelKey: "colors.lossCritical", cssVar: "--loss-custom-critical", group: "loss" },
 ];
 
 type MetricColors = Partial<Record<MetricColorKey, string>>;
@@ -69,6 +80,15 @@ const DARK_DEPTH_CACHE_KEY = "cfsm-luminaplus:dark-depth";
 const HEX = /^#[0-9a-f]{6}$/;
 /** 本机覆盖里「这个颜色不用站点色、回到主题默认色」的写法。 */
 const UNSET_COLOR = "";
+
+// 丢包率原版使用逐百分比计算的连续 HSL 渐变，下列数值仅是取色框的代表色。
+const LOSS_DEFAULT_SWATCHES: Partial<Record<MetricColorKey, string>> = {
+  lossExcellent: "#2bd257", // 0.5%
+  lossGood: "#5bde29", // 2%
+  lossModerate: "#d6e626", // 4%
+  lossElevated: "#eca820", // 7.5%
+  lossCritical: "#e25112", // 20%
+};
 export const DEFAULT_DARK_DEPTH = 0;
 
 export interface PaletteDraft {
@@ -262,7 +282,10 @@ export function useMetricColorsVersion(): number {
 export function readEffectiveColors(): Record<MetricColorKey, string> {
   const styles = getComputedStyle(document.documentElement);
   const out = {} as Record<MetricColorKey, string>;
-  for (const { key, cssVar } of METRIC_COLOR_META) out[key] = toInputHex(styles.getPropertyValue(cssVar));
+  for (const { key, cssVar } of METRIC_COLOR_META) {
+    const current = styles.getPropertyValue(cssVar).trim();
+    out[key] = current ? toInputHex(current) : (LOSS_DEFAULT_SWATCHES[key] ?? "#888888");
+  }
   return out;
 }
 

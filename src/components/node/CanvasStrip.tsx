@@ -197,7 +197,13 @@ function resolveCssColor(color: string): string {
   const resolved = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
   // 首帧空值不缓存，样式就绪后可重新解析。
   if (resolved) cssColorCache.set(varName, resolved);
-  return resolved || color;
+  if (resolved) return resolved;
+  // 无自定义色时原版 HSL fallback 会随丢包值改变，不能按变量名缓存。
+  if (color.startsWith("var(") && color.endsWith(")")) {
+    const comma = color.indexOf(",");
+    if (comma !== -1) return color.slice(comma + 1, -1).trim();
+  }
+  return color;
 }
 
 // canvas 的颜色解析器不认 color-mix()/calc()(如深色 --progress-bg 随 --dark-depth 混色),
