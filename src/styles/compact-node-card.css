@@ -211,6 +211,15 @@
   letter-spacing: -0.02em;
 }
 
+/* 与大卡 MetricBar 单位一致：单独显示 %，不继承数字的粗体及主文字色。 */
+.compact-node-gauge strong .compact-node-gauge-unit {
+  margin-left: 1px;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: normal;
+}
+
 /* 单条分段进度条(原本是 18 个 <span>)。填充是直到 --compact-gauge-fill 的硬停止渐变;
    repeating mask 切出 18 段,段间用 2px 透明缝隔开(缝隙透出卡片表面,与旧网格的 `gap` 一致)。
    周期 = (100% + 2px) / 18,缝隙 = 每个周期的最后 2px。 */

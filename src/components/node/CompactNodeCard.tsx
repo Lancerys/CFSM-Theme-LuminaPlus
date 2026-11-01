@@ -65,6 +65,7 @@ function CompactGauge({
   icon,
   label,
   value,
+  unit,
   detail,
   color,
   fraction,
@@ -72,6 +73,7 @@ function CompactGauge({
   icon: ReactNode;
   label: string;
   value: string;
+  unit?: string;
   detail?: string;
   color: string;
   fraction: number;
@@ -98,7 +100,10 @@ function CompactGauge({
           {icon}
           <span>{label}</span>
         </span>
-        <strong className="tabular">{value}</strong>
+        <strong className="tabular">
+          {value}
+          {unit && <small className="compact-node-gauge-unit">{unit}</small>}
+        </strong>
       </div>
       <div className="compact-node-gauge-track" aria-hidden />
     </div>
@@ -434,7 +439,8 @@ function CompactNodeVitals({
       <CompactGauge
         icon={<Cpu size={12} />}
         label="CPU"
-        value={formatCompactPercent(node.cpuPct)}
+        value={formatCompactPercent(node.cpuPct).slice(0, -1)}
+        unit="%"
         detail={`${node.cpuPct.toFixed(2)}% · ${t("metric.cpuCores", { n: node.cpu_cores || 0 })}`}
         fraction={node.cpuPct / 100}
         color="var(--progress-cpu)"
@@ -442,7 +448,8 @@ function CompactNodeVitals({
       <CompactGauge
         icon={<MemoryStick size={12} />}
         label={t("metric.memory")}
-        value={formatCompactPercent(node.ramPct)}
+        value={formatCompactPercent(node.ramPct).slice(0, -1)}
+        unit="%"
         detail={`${formatBytes(node.ramUsed)} / ${formatBytes(node.ramTotal)}`}
         fraction={node.ramPct / 100}
         color="var(--progress-memory)"
@@ -450,7 +457,8 @@ function CompactNodeVitals({
       <CompactGauge
         icon={<HardDrive size={12} />}
         label={t("metric.disk")}
-        value={formatCompactPercent(node.diskPct)}
+        value={formatCompactPercent(node.diskPct).slice(0, -1)}
+        unit="%"
         detail={`${formatBytes(node.diskUsed)} / ${formatBytes(node.diskTotal)}`}
         fraction={node.diskPct / 100}
         color="var(--progress-disk)"
