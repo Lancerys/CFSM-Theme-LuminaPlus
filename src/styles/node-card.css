@@ -698,27 +698,3 @@
     gap: 12px;
   }
 }
-
-
-/* 半透明节点卡启用真正的 16px 毛玻璃，保留原版透明度、交互和卡片布局。 */
-:root[data-surface-glass="true"] :is(.server-card, .compact-node-card, .mini-node-card) {
-  /* content-visibility:auto 的 paint containment 会让 backdrop-filter 失效。 */
-  content-visibility: visible;
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.32),
-    0 8px 24px rgba(20, 30, 55, 0.08);
-}
-
-:root[data-appearance="light"][data-surface-glass="true"]
-  :is(.server-card, .compact-node-card, .mini-node-card):not(:hover):not(.is-offline) {
-  border-color: rgba(255, 255, 255, 0.55);
-}
-
-:root[data-appearance="dark"][data-surface-glass="true"]
-  :is(.server-card, .compact-node-card, .mini-node-card) {
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 8px 24px rgba(0, 0, 0, 0.18);
-}

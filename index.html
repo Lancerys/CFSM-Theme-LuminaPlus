@@ -79,8 +79,6 @@
               const scrim = alpha >= 95 ? 0 : Math.round(((95 - alpha) / 95) * 16);
               const style = document.documentElement.style;
               style.setProperty("--surface-alpha", String(alpha));
-              // 首帧同步毛玻璃模式，避免页面挂载后才闪出效果。
-              document.documentElement.dataset.surfaceGlass = alpha < 100 ? "true" : "false";
               if (scrim > 0) {
                 style.setProperty(
                   "--bg-scrim",

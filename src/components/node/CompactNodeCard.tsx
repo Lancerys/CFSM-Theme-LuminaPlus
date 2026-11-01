@@ -336,7 +336,7 @@ function CompactHealthItem({
         <span className="compact-node-health-label">
           {label}
         </span>
-        <strong className="compact-node-health-value tabular" style={{ color }}>
+        <strong className="compact-node-health-value tabular" style={{ "--compact-health-status-color": color } as CSSProperties}>
           {value}
           {unit && <small>{unit}</small>}
         </strong>

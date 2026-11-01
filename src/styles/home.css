@@ -1124,11 +1124,3 @@
   min-width: 22px;
   height: 22px;
 }
-
-
-/* 半透明首页概览卡、分组/地区筛选栏共享节点卡的 16px 磨砂效果。 */
-:root[data-surface-glass="true"]
-  :is(.overview-card, .home-group-tabs, .home-region-bar, .home-sort-trigger) {
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-}

@@ -58,11 +58,8 @@ export function applySurfaceCache(cache: SurfaceCache | null): void {
   const root = document.documentElement;
   if (!cache) {
     for (const name of SURFACE_VAR_NAMES) root.style.removeProperty(name);
-    delete root.dataset.surfaceGlass;
     return;
   }
-  // 仅在卡片半透明时启用毛玻璃；完全不透明时沿用原版高性能渲染。
-  root.dataset.surfaceGlass = Number(cache.alpha) < 100 ? "true" : "false";
   root.style.setProperty("--surface-alpha", cache.alpha);
   if (cache.scrim) root.style.setProperty("--bg-scrim", cache.scrim);
   else root.style.removeProperty("--bg-scrim");
