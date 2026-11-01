@@ -36,7 +36,7 @@ import {
   toNodeInfo,
   withReportTimestamp,
 } from "@/services/cfsm/mappers";
-import { seedMeasuredHistory, setWindowBackfillGuard } from "@/services/pingLiveStore";
+import { seedMeasuredHistory } from "@/services/pingLiveStore";
 import { applySiteLanguage } from "@/i18n";
 import { resolvePreferredAppearance } from "@/utils/themeSettings";
 
@@ -160,10 +160,6 @@ export async function saveThemeOptions(
  */
 export async function getPublic(options?: RequestOptions): Promise<PublicConfig> {
   const config = await getSiteConfig(options);
-  // 新后端的 latency_window 是真实 D1 采样，连续相同的值也必须保留。
-  // 旧后端未声明窗口口径时才启用复制窗口防护；若首屏先拿到节点快照，
-  // setWindowBackfillGuard 会重算已缓存窗口，避免灰格一直留到打开详情页。
-  setWindowBackfillGuard(config.latency_window == null);
   // 内容要等配置到手才渲染（AppShell 先只显示加载圈），在这里定语言，页面一出来就是对的语言。
   applySiteLanguage(config.default_language);
   return {
