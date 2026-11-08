@@ -1,0 +1,97 @@
+/* Experimental Paraplex-style animated backgrounds. Pure CSS, no external assets. */
+.lumina-motion-background {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+  background: linear-gradient(132deg, #b4c1ae 0%, #86a392 42%, #233e3e 78%, #161e22 100%);
+  --lumina-motion-speed: 1;
+}
+.lumina-motion-background__field {
+  position: absolute;
+  display: block;
+  width: 112%;
+  height: 112%;
+  inset: -6%;
+  will-change: transform;
+  animation-duration: calc(22s / var(--lumina-motion-speed));
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+.lumina-motion-background__field--one {
+  background: radial-gradient(ellipse 62% 39% at 22% 34%, #c3cab4 0%, rgba(195,202,180,.88) 31%, transparent 77%);
+  animation-name: lumina-drift-one;
+}
+.lumina-motion-background__field--two {
+  background: radial-gradient(ellipse 64% 48% at 78% 79%, #a4bda5 0%, rgba(164,189,165,.8) 24%, transparent 75%);
+  animation-name: lumina-drift-two;
+  animation-duration: calc(29s / var(--lumina-motion-speed));
+}
+.lumina-motion-background__field--three {
+  background: radial-gradient(ellipse 62% 54% at 6% 98%, #151f24 0%, #263e3d 43%, transparent 83%);
+  animation-name: lumina-drift-three;
+  animation-duration: calc(33s / var(--lumina-motion-speed));
+}
+.lumina-motion-background__field--four {
+  background: radial-gradient(ellipse 61% 43% at 68% 28%, #6d9585 0%, rgba(70,122,111,.64) 35%, transparent 80%);
+  mix-blend-mode: soft-light;
+  animation-name: lumina-drift-four;
+  animation-duration: calc(26s / var(--lumina-motion-speed));
+}
+.lumina-motion-background--waves {
+  background: linear-gradient(132deg, #101d25, #3e655e 52%, #b0bea6);
+}
+.lumina-motion-background--waves .lumina-motion-background__field--one {
+  background: linear-gradient(155deg, transparent 16%, #bad1bc 39%, #719887 52%, transparent 70%);
+  filter: blur(9vw);
+}
+.lumina-motion-background--waves .lumina-motion-background__field--two {
+  background: linear-gradient(161deg, transparent 37%, #718f87 48%, #c5ccb4 56%, transparent 73%);
+  filter: blur(11vw);
+}
+.lumina-motion-background--waves .lumina-motion-background__field--three {
+  background: linear-gradient(163deg, #1b282c 7%, transparent 56%);
+}
+.lumina-motion-background--glow {
+  background: #111d24;
+}
+.lumina-motion-background--glow .lumina-motion-background__field--one {
+  background: radial-gradient(ellipse 38% 45% at 27% 46%, #448a7b 0%, rgba(68,138,123,.28) 54%, transparent 79%);
+}
+.lumina-motion-background--glow .lumina-motion-background__field--two {
+  background: radial-gradient(ellipse 37% 40% at 83% 31%, #9bbca6 0%, rgba(155,188,166,.22) 47%, transparent 80%);
+}
+.lumina-motion-background--glow .lumina-motion-background__field--three {
+  background: radial-gradient(ellipse 45% 44% at 51% 100%, #345863 0%, rgba(52,88,99,.17) 58%, transparent 83%);
+}
+.lumina-motion-background--video {
+  background: var(--bg-0);
+}
+.lumina-motion-background--video video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@keyframes lumina-drift-one {
+  0% { transform: translate3d(-3%, -4%, 0) rotate(-5deg) scale(1.08); }
+  100% { transform: translate3d(7%, 5%, 0) rotate(6deg) scale(1.15); }
+}
+@keyframes lumina-drift-two {
+  0% { transform: translate3d(7%, 4%, 0) rotate(4deg) scale(1.1); }
+  100% { transform: translate3d(-8%, -5%, 0) rotate(-5deg) scale(1.17); }
+}
+@keyframes lumina-drift-three {
+  0% { transform: translate3d(-5%, 5%, 0) rotate(-3deg) scale(1.1); }
+  100% { transform: translate3d(5%, -5%, 0) rotate(7deg) scale(1.18); }
+}
+@keyframes lumina-drift-four {
+  0% { transform: translate3d(5%, -6%, 0) scale(1.07); }
+  100% { transform: translate3d(-8%, 7%, 0) scale(1.14); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lumina-motion-background__field { animation: none !important; }
+}
