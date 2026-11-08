@@ -521,8 +521,7 @@ export interface ThemeSettings {
   >;
   costRateApiUrl?: string;
   surfaceOpacity?: number;
-  animatedBackgroundMode?: "off" | "mesh" | "waves" | "glow" | "video";
-  animatedBackgroundSpeed?: number;
+  animatedBackgroundMode?: "off" | "video";
   animatedBackgroundVideoUrl?: string;
 }
 
