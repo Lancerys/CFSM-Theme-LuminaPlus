@@ -28,8 +28,13 @@ export function BackgroundLayer() {
 
   if (!isReady || animatedBackgroundMode === "off") return null;
 
+  // 浏览器对 CSS calc(22s / var(--speed)) 的兼容性不一致，
+  // 用 JS 先算好合法的时间值，避免 animation-duration 变成 0s 而静止。
   const style = {
-    "--lumina-motion-speed": animatedBackgroundSpeed,
+    "--lumina-motion-duration-one": `${14 / animatedBackgroundSpeed}s`,
+    "--lumina-motion-duration-two": `${18 / animatedBackgroundSpeed}s`,
+    "--lumina-motion-duration-three": `${23 / animatedBackgroundSpeed}s`,
+    "--lumina-motion-duration-four": `${17 / animatedBackgroundSpeed}s`,
   } as CSSProperties;
 
   if (animatedBackgroundMode === "video") {
