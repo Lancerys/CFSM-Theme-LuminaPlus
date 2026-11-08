@@ -87,6 +87,9 @@ export interface ResolvedThemeSettings {
   costPremiums: Record<string, CostPremiumEntry>;
   costRateApiUrl: string;
   surfaceOpacity: number;
+  animatedBackgroundMode: "off" | "mesh" | "waves" | "glow" | "video";
+  animatedBackgroundSpeed: number;
+  animatedBackgroundVideoUrl: string;
 }
 
 export const DEFAULT_THEME_SETTINGS: ResolvedThemeSettings = {
@@ -134,6 +137,9 @@ export const DEFAULT_THEME_SETTINGS: ResolvedThemeSettings = {
   costPremiums: {},
   costRateApiUrl: DEFAULT_COST_RATE_API_URL,
   surfaceOpacity: DEFAULT_SURFACE_OPACITY,
+  animatedBackgroundMode: "off",
+  animatedBackgroundSpeed: 1,
+  animatedBackgroundVideoUrl: "",
 };
 
 /** 首页默认分组：只收非空字符串，长度掐在合理范围内（分组名来自后端）。 */
@@ -300,5 +306,14 @@ export function normalizeThemeSettings(
     costRateApiUrl: normalizeCostRateApiUrl(settings?.costRateApiUrl),
     // 默认开:让已配置背景图的存量站点升级后行为不变;关闭 = 保留 URL 但不加载背景图。
     surfaceOpacity: normalizeSurfaceOpacity(settings?.surfaceOpacity),
+    animatedBackgroundMode: ["off", "mesh", "waves", "glow", "video"].includes(String(settings?.animatedBackgroundMode))
+      ? settings?.animatedBackgroundMode as ResolvedThemeSettings["animatedBackgroundMode"]
+      : "off",
+    animatedBackgroundSpeed: typeof settings?.animatedBackgroundSpeed === "number" && Number.isFinite(settings.animatedBackgroundSpeed)
+      ? Math.max(0.25, Math.min(3, settings.animatedBackgroundSpeed))
+      : 1,
+    animatedBackgroundVideoUrl: typeof settings?.animatedBackgroundVideoUrl === "string" && /^https?:\/\//i.test(settings.animatedBackgroundVideoUrl.trim())
+      ? settings.animatedBackgroundVideoUrl.trim().slice(0, 2048)
+      : "",
   };
 }
