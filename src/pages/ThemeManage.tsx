@@ -341,7 +341,6 @@ function pickManagedThemeSettings(settings: ResolvedThemeSettings) {
     costRateApiUrl: settings.costRateApiUrl,
     surfaceOpacity: settings.surfaceOpacity,
     animatedBackgroundMode: settings.animatedBackgroundMode,
-    animatedBackgroundSpeed: settings.animatedBackgroundSpeed,
     animatedBackgroundVideoUrl: settings.animatedBackgroundVideoUrl,
   };
 }
@@ -1770,30 +1769,10 @@ export function ThemeManage() {
                       onChange={(event) => patch("animatedBackgroundMode", event.target.value as ThemeDraft["animatedBackgroundMode"])}
                     >
                       <option value="off">{t("settings.motionOff")}</option>
-                      <option value="mesh">{t("settings.motionMesh")}</option>
-                      <option value="waves">{t("settings.motionWaves")}</option>
-                      <option value="glow">{t("settings.motionGlow")}</option>
                       <option value="video">{t("settings.motionVideo")}</option>
                     </select>
                     <p className="mt-2 setting-hint">{t("settings.motionHint")}</p>
                   </div>
-                  {draft.animatedBackgroundMode !== "off" && draft.animatedBackgroundMode !== "video" && (
-                    <div className="surface-inset px-4 py-4">
-                      <label className="setting-subhead-title" htmlFor="motion-speed">
-                        {t("settings.motionSpeed")} · {draft.animatedBackgroundSpeed.toFixed(2)}×
-                      </label>
-                      <input
-                        id="motion-speed"
-                        className="mt-3 w-full"
-                        type="range"
-                        min={0.25}
-                        max={3}
-                        step={0.25}
-                        value={draft.animatedBackgroundSpeed}
-                        onChange={(event) => patch("animatedBackgroundSpeed", Number(event.target.value))}
-                      />
-                    </div>
-                  )}
                   {draft.animatedBackgroundMode === "video" && (
                     <div className="surface-inset px-4 py-4">
                       <label className="setting-subhead-title" htmlFor="motion-video-url">
