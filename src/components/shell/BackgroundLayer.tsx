@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, type CSSProperties } from "react";
 import { useThemeSettings } from "@/hooks/useThemeSettings";
 import {
   applySurfaceCache,
@@ -7,12 +7,17 @@ import {
 } from "@/utils/background";
 
 /**
- * 同步卡片透明度相关的 CSS 变量与首帧缓存。
- *
- * 背景图由 CF-Server-Monitor 后台外观设置直接注入到 `<body>`，主题不再自己加载背景图。
+ * 背景图仍由 CF-Server-Monitor 后台注入。动画模式启用时在其上绘制独立底层，
+ * 既不修改后台图片设置，也不影响卡片表面透明度。
  */
 export function BackgroundLayer() {
-  const { surfaceOpacity, isReady } = useThemeSettings();
+  const {
+    surfaceOpacity,
+    isReady,
+    animatedBackgroundMode,
+    animatedBackgroundSpeed,
+    animatedBackgroundVideoUrl,
+  } = useThemeSettings();
 
   useEffect(() => {
     if (!isReady) return;
@@ -21,5 +26,39 @@ export function BackgroundLayer() {
     applySurfaceCache(cache);
   }, [isReady, surfaceOpacity]);
 
-  return null;
+  if (!isReady || animatedBackgroundMode === "off") return null;
+
+  const style = {
+    "--lumina-motion-speed": animatedBackgroundSpeed,
+  } as CSSProperties;
+
+  if (animatedBackgroundMode === "video") {
+    if (!animatedBackgroundVideoUrl) return null;
+    return (
+      <div className="lumina-motion-background lumina-motion-background--video" aria-hidden="true">
+        <video
+          src={animatedBackgroundVideoUrl}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          disablePictureInPicture
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`lumina-motion-background lumina-motion-background--${animatedBackgroundMode}`}
+      style={style}
+      aria-hidden="true"
+    >
+      <span className="lumina-motion-background__field lumina-motion-background__field--one" />
+      <span className="lumina-motion-background__field lumina-motion-background__field--two" />
+      <span className="lumina-motion-background__field lumina-motion-background__field--three" />
+      <span className="lumina-motion-background__field lumina-motion-background__field--four" />
+    </div>
+  );
 }
