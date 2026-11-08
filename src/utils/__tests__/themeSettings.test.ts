@@ -2,6 +2,17 @@ import { describe, expect, it } from "vitest";
 import { DEFAULT_THEME_SETTINGS, normalizeThemeSettings } from "@/utils/themeSettings";
 
 describe("normalizeThemeSettings", () => {
+  it("supports video-only backgrounds and retires legacy CSS modes", () => {
+    const url = "https://background.hsiao.tech/green-mesh.mp4";
+    expect(normalizeThemeSettings({}).animatedBackgroundMode).toBe("off");
+    expect(normalizeThemeSettings({ animatedBackgroundMode: "mesh" } as never).animatedBackgroundMode).toBe("off");
+    expect(normalizeThemeSettings({ animatedBackgroundMode: "waves" } as never).animatedBackgroundMode).toBe("off");
+    expect(normalizeThemeSettings({ animatedBackgroundMode: "glow" } as never).animatedBackgroundMode).toBe("off");
+    const video = normalizeThemeSettings({ animatedBackgroundMode: "video", animatedBackgroundVideoUrl: url });
+    expect(video.animatedBackgroundMode).toBe("video");
+    expect(video.animatedBackgroundVideoUrl).toBe(url);
+  });
+
   it("keeps mini and falls unknown saved view modes back to compact", () => {
     const settings = normalizeThemeSettings({
       desktopNodeViewMode: "retired-view",
