@@ -2,12 +2,17 @@
 .lumina-motion-background {
   position: fixed;
   inset: 0;
-  z-index: 20;
+  /* 在 #root 内的独立负层级，盖过旧静态图，但位于所有节点卡片下方。 */
+  z-index: -1;
   overflow: hidden;
   pointer-events: none;
   isolation: isolate;
   background: linear-gradient(132deg, #b4c1ae 0%, #86a392 42%, #233e3e 78%, #161e22 100%);
-  --lumina-motion-speed: 1;
+  /* 显式值由 BackgroundLayer 算好；所有浏览器都有合法的秒数兜底。 */
+  --lumina-motion-duration-one: 14s;
+  --lumina-motion-duration-two: 18s;
+  --lumina-motion-duration-three: 23s;
+  --lumina-motion-duration-four: 17s;
 }
 .lumina-motion-background__field {
   position: absolute;
@@ -16,7 +21,7 @@
   height: 112%;
   inset: -6%;
   will-change: transform;
-  animation-duration: calc(22s / var(--lumina-motion-speed));
+  animation-duration: var(--lumina-motion-duration-one, 14s);
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
   animation-direction: alternate;
@@ -28,18 +33,18 @@
 .lumina-motion-background__field--two {
   background: radial-gradient(ellipse 64% 48% at 78% 79%, #a4bda5 0%, rgba(164,189,165,.8) 24%, transparent 75%);
   animation-name: lumina-drift-two;
-  animation-duration: calc(29s / var(--lumina-motion-speed));
+  animation-duration: var(--lumina-motion-duration-two, 18s);
 }
 .lumina-motion-background__field--three {
   background: radial-gradient(ellipse 62% 54% at 6% 98%, #151f24 0%, #263e3d 43%, transparent 83%);
   animation-name: lumina-drift-three;
-  animation-duration: calc(33s / var(--lumina-motion-speed));
+  animation-duration: var(--lumina-motion-duration-three, 23s);
 }
 .lumina-motion-background__field--four {
   background: radial-gradient(ellipse 61% 43% at 68% 28%, #6d9585 0%, rgba(70,122,111,.64) 35%, transparent 80%);
   mix-blend-mode: soft-light;
   animation-name: lumina-drift-four;
-  animation-duration: calc(26s / var(--lumina-motion-speed));
+  animation-duration: var(--lumina-motion-duration-four, 17s);
 }
 .lumina-motion-background--waves {
   background: linear-gradient(132deg, #101d25, #3e655e 52%, #b0bea6);
@@ -77,21 +82,19 @@
   object-fit: cover;
 }
 @keyframes lumina-drift-one {
-  0% { transform: translate3d(-3%, -4%, 0) rotate(-5deg) scale(1.08); }
-  100% { transform: translate3d(7%, 5%, 0) rotate(6deg) scale(1.15); }
+  0% { transform: translate3d(-8%, -8%, 0) rotate(-5deg) scale(1.1); }
+  100% { transform: translate3d(12%, 10%, 0) rotate(6deg) scale(1.2); }
 }
 @keyframes lumina-drift-two {
-  0% { transform: translate3d(7%, 4%, 0) rotate(4deg) scale(1.1); }
-  100% { transform: translate3d(-8%, -5%, 0) rotate(-5deg) scale(1.17); }
+  0% { transform: translate3d(11%, 9%, 0) rotate(4deg) scale(1.1); }
+  100% { transform: translate3d(-12%, -10%, 0) rotate(-6deg) scale(1.2); }
 }
 @keyframes lumina-drift-three {
-  0% { transform: translate3d(-5%, 5%, 0) rotate(-3deg) scale(1.1); }
-  100% { transform: translate3d(5%, -5%, 0) rotate(7deg) scale(1.18); }
+  0% { transform: translate3d(-10%, 10%, 0) rotate(-5deg) scale(1.1); }
+  100% { transform: translate3d(12%, -11%, 0) rotate(7deg) scale(1.2); }
 }
 @keyframes lumina-drift-four {
-  0% { transform: translate3d(5%, -6%, 0) scale(1.07); }
-  100% { transform: translate3d(-8%, 7%, 0) scale(1.14); }
+  0% { transform: translate3d(11%, -12%, 0) scale(1.1); }
+  100% { transform: translate3d(-11%, 12%, 0) scale(1.2); }
 }
-@media (prefers-reduced-motion: reduce) {
-  .lumina-motion-background__field { animation: none !important; }
-}
+/* 动效默认关闭；用户在主题设置中显式选中后才播放。 */
