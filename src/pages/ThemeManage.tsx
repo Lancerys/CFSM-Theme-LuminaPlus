@@ -340,6 +340,9 @@ function pickManagedThemeSettings(settings: ResolvedThemeSettings) {
     ),
     costRateApiUrl: settings.costRateApiUrl,
     surfaceOpacity: settings.surfaceOpacity,
+    animatedBackgroundMode: settings.animatedBackgroundMode,
+    animatedBackgroundSpeed: settings.animatedBackgroundSpeed,
+    animatedBackgroundVideoUrl: settings.animatedBackgroundVideoUrl,
   };
 }
 
@@ -1750,6 +1753,64 @@ export function ThemeManage() {
                   />
                 </div>
                 <p className="mt-3 setting-hint">{t("settings.quickHint")}</p>
+              </InstancePanel>
+
+              <InstancePanel
+                id="set-animated-background"
+                kicker={t("settings.kickerBackground")}
+                title={t("settings.motionBackgroundTitle")}
+                aside={<Wallpaper size={16} />}
+              >
+                <div className="flex flex-col gap-4">
+                  <div className="surface-inset px-4 py-4">
+                    <div className="setting-subhead-title mb-2">{t("settings.motionBackgroundMode")}</div>
+                    <select
+                      className="surface-inset w-full px-3 py-2 text-[13px]"
+                      value={draft.animatedBackgroundMode}
+                      onChange={(event) => patch("animatedBackgroundMode", event.target.value as ThemeDraft["animatedBackgroundMode"])}
+                    >
+                      <option value="off">{t("settings.motionOff")}</option>
+                      <option value="mesh">{t("settings.motionMesh")}</option>
+                      <option value="waves">{t("settings.motionWaves")}</option>
+                      <option value="glow">{t("settings.motionGlow")}</option>
+                      <option value="video">{t("settings.motionVideo")}</option>
+                    </select>
+                    <p className="mt-2 setting-hint">{t("settings.motionHint")}</p>
+                  </div>
+                  {draft.animatedBackgroundMode !== "off" && draft.animatedBackgroundMode !== "video" && (
+                    <div className="surface-inset px-4 py-4">
+                      <label className="setting-subhead-title" htmlFor="motion-speed">
+                        {t("settings.motionSpeed")} · {draft.animatedBackgroundSpeed.toFixed(2)}×
+                      </label>
+                      <input
+                        id="motion-speed"
+                        className="mt-3 w-full"
+                        type="range"
+                        min={0.25}
+                        max={3}
+                        step={0.25}
+                        value={draft.animatedBackgroundSpeed}
+                        onChange={(event) => patch("animatedBackgroundSpeed", Number(event.target.value))}
+                      />
+                    </div>
+                  )}
+                  {draft.animatedBackgroundMode === "video" && (
+                    <div className="surface-inset px-4 py-4">
+                      <label className="setting-subhead-title" htmlFor="motion-video-url">
+                        {t("settings.motionVideoUrl")}
+                      </label>
+                      <input
+                        id="motion-video-url"
+                        type="url"
+                        className="surface-inset mt-2 w-full px-3 py-2 text-[13px]"
+                        placeholder="https://example.com/background.mp4"
+                        value={draft.animatedBackgroundVideoUrl}
+                        onChange={(event) => patch("animatedBackgroundVideoUrl", event.target.value)}
+                      />
+                      <p className="mt-2 setting-hint">{t("settings.motionVideoHint")}</p>
+                    </div>
+                  )}
+                </div>
               </InstancePanel>
 
               <InstancePanel
