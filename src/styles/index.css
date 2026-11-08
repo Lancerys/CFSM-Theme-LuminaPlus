@@ -10,7 +10,7 @@
 @source "../../index.html";
 @import "./tokens.css";
 @import "./surface.css";
-@import "./animated-background.css";
+@import "./video-background.css";
 @import "./home.css";
 @import "./cost-summary.css";
 @import "./traffic-stats.css";
