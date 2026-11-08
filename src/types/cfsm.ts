@@ -521,6 +521,9 @@ export interface ThemeSettings {
   >;
   costRateApiUrl?: string;
   surfaceOpacity?: number;
+  animatedBackgroundMode?: "off" | "mesh" | "waves" | "glow" | "video";
+  animatedBackgroundSpeed?: number;
+  animatedBackgroundVideoUrl?: string;
 }
 
 /** 图表用的一行历史负载记录，单位与 NodeMetrics 一致。 */
